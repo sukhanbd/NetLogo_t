@@ -8,8 +8,8 @@ turtles-own [ ;; Turtle characteristics + this is how you add comments after dou
 to setup ;; This is to set up the simulation environment
   clear-all
 
-  create-turtles 100 [setxy random-xcor random-ycor ;; Create 100 agents, randomly distributed within the global patch
-    set Infectious false set shape "person"]
+  create-turtles 50 [setxy random-xcor random-ycor ;; Create 100 agents, randomly distributed within the global patch
+    set Infectious false set shape "person" set dead false set immune false set duration_infection 0]
 
   ask one-of turtles [set Infectious true] ;;Introduce infection to one of the agents (turtles) created earlier
 
@@ -27,6 +27,7 @@ to go ;;Agents will move around the global patch during each time-step (tick)
   ;; Introducing functions for the simulation
   ask turtles [move]
   ask turtles [spread]
+  ask turtles [recover]
   ask turtles [recolor]
 
   tick
@@ -34,23 +35,43 @@ to go ;;Agents will move around the global patch during each time-step (tick)
 end
 
 to move;; Define function
-  right random 140 ;; during each time-step rotate 140 degree to the right and 90 degree to the left
-  left random 90
+  if dead = false ;;the agents will not move if the status is dead
+  [
+    right random 140 ;; during each time-step rotate 140 degree to the right and 90 degree to the left
+    left random 90
 
-  fd 1; go forward 1 step
-
+    fd 1; go forward 1 step
+  ]
 end
+
+to recover ;; define recovery from infection
+  if Infectious [
+    set duration_infection duration_infection + 1 ;;Applies only to the infectious + duration of infectious period increments over time
+    if random-float 1.0 < 0.05 and duration_infection >  [ ;; generate random recovary probability between 0 and 1, probability of recovary is less than 5% and can only recover after 9 days
+      set Infectious false ;; if the condition above is filled, remove them from the infectious class and move to immune
+      set immune true
+    if random-float 1.0 < 0.10 and duration_infection > 10[ ;; similar logic above, if the duration 10% probability of death after 10 days
+        set dead true
+      ]
+  ]]
+end
+
 
 to spread ;; Defind conditions for between agent spread of infection/turtle-to-turtle-interaction
   ifelse Infectious [] [
     if any? other turtles-here with [Infectious] ;; During the random movement, if two or more agents occupy the same space (location defined by xcor and ycor) infection will spread (next line)
-    [set Infectious true]
+    [
+      if immune = false
+      [set Infectious true];; if there is any infectious near, transmission will occur
+    ]
   ]
 end
 
 
 to recolor ;; Change color of the agents to show state change [red - Infectious, blue - not infectious], if infectious, set color to red, otherwise blue
   ifelse Infectious [set color red] [set color blue]
+  if immune [set color yellow]
+  if dead [set color black]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
