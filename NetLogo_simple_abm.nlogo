@@ -1,10 +1,60 @@
+turtles-own [ ;; Turtle characteristics + this is how you add comments after double semicolon
+  Infectious ;; Being infectious [true/false]
+]
 
+to setup ;; This is to set up the simulation environment
+  clear-all
+
+  create-turtles 100 [setxy random-xcor random-ycor ;; Create 100 agents, randomly distributed within the global patch
+    set Infectious false set shape "person"]
+
+  ask one-of turtles [set Infectious true] ;;Introduce infection to one of the agents (turtles) created earlier
+
+  reset-ticks ;;Reset time of this semulation
+
+end
+
+
+;; Start creating functions
+
+to go ;;Agents will move around the global patch during each time-step (tick)
+
+  if all? turtles [Infectious] [stop] ;;Stop simulation when all agents are Infectious
+
+  ;; Introducing functions for the simulation
+  ask turtles [move]
+  ask turtles [spread]
+  ask turtles [recolor]
+
+  tick
+
+end
+
+to move;; Define function
+  right random 140 ;; during each time-step rotate 140 degree to the right and 90 degree to the left
+  left random 90
+
+  fd 1; go forward 1 step
+
+end
+
+to spread ;; Defind conditions for between agent spread of infection/turtle-to-turtle-interaction
+  ifelse Infectious [] [
+    if any? other turtles-here with [Infectious] ;; During the random movement, if two or more agents occupy the same space (location defined by xcor and ycor) infection will spread (next line)
+    [set Infectious true]
+  ]
+end
+
+
+to recolor ;; Change color of the agents to show state change [red - Infectious, blue - not infectious], if infectious, set color to red, otherwise blue
+  ifelse Infectious [set color red] [set color blue]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-855
-656
+647
+448
 -1
 -1
 13.0
@@ -17,15 +67,49 @@ GRAPHICS-WINDOW
 1
 1
 1
--24
-24
--24
-24
+-16
+16
+-16
+16
 0
 0
 1
 ticks
-60.0
+30.0
+
+BUTTON
+5
+10
+69
+43
+Setup
+setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+77
+10
+140
+43
+Start
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
