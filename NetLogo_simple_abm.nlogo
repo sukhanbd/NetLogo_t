@@ -1,8 +1,5 @@
 turtles-own [ ;; Turtle characteristics + this is how you add comments after double semicolon
   Infectious ;; Being infectious [true/false] - Only one variable
-  dead ;; Alive or dead [true/false]
-  immune ;; is immune [true/false]
-  duration_infection ;; duration of infection
 ]
 
 to setup ;; This is to set up the simulation environment
